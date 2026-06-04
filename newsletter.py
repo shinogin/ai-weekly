@@ -102,10 +102,9 @@ def main():
         "status":            "confirmed",  # 即時送信
         "send_at":           None,         # 即時 or タイムスタンプで予約送信も可
     }
-
+; print(r.status_code, r.text)
     r = requests.post(f"{BASE}/publications/{PUB_ID}/posts", headers=HEADERS, json=payload, timeout=30)
-        print('STATUS', r.status_code, r.text)
-    pid = r.json().get("data", {}).get("id", "?")
+      pid = r.json().get("data", {}).get("id", "?")
     print(f"完了！ post_id={pid}")
 
 if __name__ == "__main__":
