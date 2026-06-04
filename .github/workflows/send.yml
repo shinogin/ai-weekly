@@ -15,7 +15,7 @@ on:
                                                 python-version: '3.11'
                                                       - run: pip install requests
                                                             - name: send
-                                                                    run: python generate_newsletter_v2.py
+                                                                            run: python newsletter.py
                                                                             env:
                                                                                       BEEHIIV_API_KEY: ${{ secrets.BEEHIIV_API_KEY }}
                                                                                                 BEEHIIV_PUB_ID: ${{ secrets.BEEHIIV_PUB_ID }}
