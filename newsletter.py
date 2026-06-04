@@ -104,7 +104,7 @@ def main():
     }
 
     r = requests.post(f"{BASE}/publications/{PUB_ID}/posts", headers=HEADERS, json=payload, timeout=30)
-    r.raise_for_status()
+        print('STATUS', r.status_code, r.text)
     pid = r.json().get("data", {}).get("id", "?")
     print(f"完了！ post_id={pid}")
 
