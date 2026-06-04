@@ -1,0 +1,27 @@
+name: AI週報 自動生成・配信
+
+on:
+  schedule:
+    - cron: '0 17 * * 0'   # 毎週日曜17:00 UTC = 月曜AM2:00 JST
+  workflow_dispatch:         # 手動実行ボタン（テスト用）
+
+jobs:
+  send-newsletter:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: 依存インストール
+        run: pip install anthropic requests
+
+      - name: 生成・配信
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          BEEHIIV_API_KEY:   ${{ secrets.BEEHIIV_API_KEY }}
+          BEEHIIV_PUB_ID:    ${{ secrets.BEEHIIV_PUB_ID }}
+        run: python generate_newsletter_v2.py
