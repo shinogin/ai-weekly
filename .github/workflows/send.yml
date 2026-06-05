@@ -16,5 +16,4 @@ jobs:
       - run: pip install requests
       - run: python newsletter.py
         env:
-          BEEHIIV_API_KEY: ${{ secrets.BEEHIIV_API_KEY }}
-          BEEHIIV_PUB_ID: ${{ secrets.BEEHIIV_PUB_ID }}
+                    KIT_API_KEY: ${{ secrets.KIT_API_KEY }}
