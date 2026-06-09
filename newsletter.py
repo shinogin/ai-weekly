@@ -10,9 +10,9 @@ import urllib.request, urllib.parse, urllib.error
 # ---------- 設定 ----------
 KIT_API_KEY      = os.environ.get("KIT_API_KEY", "")
 BLOGGER_TOKEN    = os.environ.get("BLOGGER_OAUTH_TOKEN", "")  # 任意。なければBloggerスキップ
-BLOGGER_BLOG_ID  = os.environ.get("BLOGGER_BLOG_ID", "7460768131137491269")
-STRIPE_PRO_URL   = "https://buy.stripe.com/6oUdR9clA9ze9mj34E53000"
+BLOGGER_BLOG_ID  = os.environ.get("BLOGGER_BLOG_ID", "")  # AI週報用Blogger ID（マネーナビとは別ブログ。空の場合はBlogger投稿を完全スキップ）STRIPE_PRO_URL   = "https://buy.stripe.com/6oUdR9clA9ze9mj34E53000"
 LANDING_URL      = "https://shinogin.github.io/ai-weekly"
+STRIPE_PRO_URL   = "https://buy.stripe.com/6oUdR9clA9ze9mj34E53000"
 
 # 無料ソース（追加コストゼロ）
 SOURCES = [
