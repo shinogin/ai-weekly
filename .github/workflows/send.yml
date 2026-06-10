@@ -2,7 +2,7 @@ name: AI Weekly
 
 on:
   schedule:
-    - cron: '0 17 * * 0'
+    - cron: '0 17 * * 0'   # 毎週月曜 02:00 JST (UTC日曜 17:00)
   workflow_dispatch:
 
 jobs:
@@ -13,7 +13,9 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - run: pip install requests
       - run: python newsletter.py
         env:
-                    KIT_API_KEY: ${{ secrets.KIT_API_KEY }}
+          KIT_API_KEY:        ${{ secrets.KIT_API_KEY }}
+          BLOGGER_POST_EMAIL: ${{ secrets.BLOGGER_POST_EMAIL }}
+          GMAIL_USER:         ${{ secrets.GMAIL_USER }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
