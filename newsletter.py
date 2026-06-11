@@ -12,7 +12,7 @@ from email.mime.text import MIMEText
 
 # ---------- 設定 ----------
 KIT_API_KEY        = os.environ.get("KIT_API_KEY", "")
-STRIPE_PRO_URL     = "https://buy.stripe.com/6oUdR9clA9ze9mj34E53000"
+STRIPE_PRO_URL     = "https://buy.stripe.com/6oUdR9clA9ze9hmj34E53000"
 LANDING_URL        = "https://shinogin.github.io/ai-weekly"
 
 # Blogger メール投稿（SMTPで送るだけで自動投稿される）
@@ -195,7 +195,7 @@ def post_blogger_via_email(subject, html_body):
 
 # ---------- 実行 ----------
 def main():
-    vol = (datetime.date.today() - datetime.date(2025, 9, 1)).days // 7 + 1
+    vol = (datetime.date.today() - datetime.date(2026, 6, 9)).days // 7 + 1
     print(f"[START] AI週報 Vol.{vol}")
     items = collect()
     print(f"[COLLECT] {len(items)} items")
