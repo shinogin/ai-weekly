@@ -13,7 +13,7 @@ from email.mime.text import MIMEText
 
 # ---------- 設定 ----------
 KIT_API_KEY = os.environ.get("KIT_API_KEY", "")
-STRIPE_PRO_URL = "https://buy.stripe.com/6oUdR9clA9ze9mj34E53000"
+STRIPE_PRO_URL = "https://buy.stripe.com/6oUdR9clA9ze9mj34E53O00"
 LANDING_URL = "https://shinogin.github.io/ai-weekly"
 
 # Blogger メール投稿（SMTPで送るだけで自動投稿される）
