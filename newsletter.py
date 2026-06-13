@@ -13,7 +13,7 @@ from email.mime.text import MIMEText
 
 # ---------- 設定 ----------
 KIT_API_KEY = os.environ.get("KIT_API_KEY", "")
-STRIPE_PRO_URL = "https://buy.stripe.com/6oUdR9clA9ze9mj34E53O00"
+STRIPE_PRO_URL = "https://buy.stripe.com/aFa3cv5Xc26M9mj6gQ53O01"
 LANDING_URL = "https://shinogin.github.io/ai-weekly"
 
 # Blogger メール投稿（SMTPで送るだけで自動投稿される）
@@ -203,7 +203,7 @@ def render_html(vol, items):
 <div style="margin:32px 0 24px;padding:24px;background:#111;color:#faf9f6;border-radius:4px">
   <div style="font-size:11px;letter-spacing:.12em;color:#e07060;margin-bottom:8px">PRO版のご案内</div>
   <h2 style="font-family:Georgia,serif;font-size:20px;margin:0 0 10px">もっと深く、もっと使えるAI情報を</h2>
-  <p style="font-size:13px;color:#bbb;margin:0 0 16px">PRO版（月額¥980）では、全記事の詳細解説 / 週次プロンプトテンプレ5選 / AIツール詳細レビュー / バックナンバー全アクセスが追加で読めます。</p>
+  <p style="font-size:13px;color:#bbb;margin:0 0 16px">PRO版（月額¥500）では、全記事の詳細解説 / 週次プロンプトテンプレ5選 / AIツール詳細レビュー / バックナンバー全アクセスが追加で読めます。</p>
   <a href="{STRIPE_PRO_URL}" style="display:inline-block;background:#c0392b;color:#fff;padding:12px 24px;text-decoration:none;font-size:13px;font-weight:500;border-radius:2px">PRO版にアップグレード →</a>
 </div>
 <div style="border-top:1px solid #ddd;padding-top:16px;margin-top:32px;color:#888;font-size:11px;text-align:center">
