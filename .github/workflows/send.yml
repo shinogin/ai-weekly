@@ -5,6 +5,9 @@ on:
     - cron: '0 17 * * 0'   # 毎週月曜 02:00 JST (UTC日曜 17:00)
   workflow_dispatch:
 
+permissions:
+  contents: write   # vol.txt をコミットし戻すために必要
+
 jobs:
   send:
     runs-on: ubuntu-latest
@@ -19,3 +22,14 @@ jobs:
           BLOGGER_POST_EMAIL: ${{ secrets.BLOGGER_POST_EMAIL }}
           GMAIL_USER:         ${{ secrets.GMAIL_USER }}
           GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+      - name: Persist vol counter
+        run: |
+          if [[ -n "$(git status --porcelain vol.txt)" ]]; then
+            git config user.name  "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git add vol.txt
+            git commit -m "chore: bump vol counter [skip ci]"
+            git push
+          else
+            echo "vol.txt unchanged; nothing to commit"
+          fi
