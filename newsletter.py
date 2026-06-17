@@ -181,7 +181,7 @@ def render_html(vol, items):
             )
         sections_html.append(
             f'<h3 style="font-family:Georgia,serif;font-size:16px;color:#c0392b;border-bottom:2px solid #111;padding-bottom:6px;margin:32px 0 16px">{html.escape(src)}</h3>'
-            f'<ul style="padding:0;margin:0">{""  .join(rows)}</ul>'
+            f'<ul style="padding:0;margin:0">{"".join(rows)}</ul>'
         )
 
     return f"""<!DOCTYPE html>
@@ -194,7 +194,7 @@ def render_html(vol, items):
 <div style="background:#fff8f0;border-left:3px solid #c0392b;padding:14px 18px;margin-bottom:28px;font-size:14px;color:#444;line-height:1.7">
   {summary}
 </div>
-{""  .join(sections_html)}
+{"".join(sections_html)}
 <div style="margin:48px 0 24px;padding:24px;background:#f7f7f5;border:1px solid #e0e0e0;border-radius:4px">
   <h3 style="font-family:Georgia,serif;font-size:17px;margin:0 0 14px;color:#111">📊 今週のまとめ</h3>
   <ul style="padding:0;margin:0;color:#444;font-size:14px">
@@ -311,6 +311,29 @@ def write_last_vol(v):
     with open(VOL_FILE, "w", encoding="utf-8") as f:
         f.write(str(v))
 
+
+# ---------- X投稿用テキスト生成 ----------
+def compose_tweet(vol, items):
+    """週刊ニュースのハイライトからツイート文を生成（280文字以内）"""
+    highlights = []
+    seen = set()
+    for it in items:
+        s = it['source']
+        if s not in seen and len(highlights) < 3:
+            t = it['title']
+            if len(t) > 28: t = t[:26] + '…'
+            highlights.append(t)
+            seen.add(s)
+    lines = [f'📬 AI週報 Vol.{vol} 配信', '']
+    for h in highlights:
+        lines.append(f'・{h}')
+    lines += ['', f'厳選{len(items)}件のAIニュース👇', LANDING_URL, '', '#AI #LLM #AIエージェント']
+    tweet = chr(10).join(lines)
+    if len(tweet) > 280:
+        lines = [f'📬 AI週報 Vol.{vol} 配信', '', f'厳選{len(items)}件のAIニュース👇', LANDING_URL, '', '#AI #LLM #AIエージェント']
+        tweet = chr(10).join(lines)
+    return tweet
+
 # ---------- 実行 ----------
 def main():
     vol = read_last_vol() + 1   # 前回送信号の次の番号 = 今回の号数
@@ -331,6 +354,11 @@ def main():
     if ok:
         write_last_vol(vol)   # 送信成功時のみ号数を確定・永続化
         print(f"[VOL] saved Vol.{vol} to {VOL_FILE}")
+    # X投稿用テキスト（コピペ用）をログに出力
+    tweet = compose_tweet(vol, items)
+    print("[X TWEET - コピペ用] " + "-"*40)
+    print(tweet)
+    print("-"*50)
     print("[DONE]")
 
 if __name__ == "__main__":
