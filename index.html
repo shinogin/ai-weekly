@@ -8,9 +8,9 @@
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --ink:#111;--ink2:#444;--ink3:#888;
-  --bg:#faf9f6;--bg2:#f2f0eb;--rule:#ddd;
-  --red:#c0392b;--gold:#9a7d3a;
+--ink:#111;--ink2:#444;--ink3:#888;
+--bg:#faf9f6;--bg2:#f2f0eb;--rule:#ddd;
+--red:#c0392b;--gold:#9a7d3a;
 }
 html{scroll-behavior:smooth}
 body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--ink);font-size:16px;line-height:1.7}
@@ -82,9 +82,11 @@ h1 em{font-style:normal;color:var(--red)}
 .pcta:hover{background:var(--ink);color:var(--bg)}
 .plan.hot .pcta{background:var(--red);border-color:var(--red);color:#fff}
 .plan.hot .pcta:hover{background:#a0302a}
-footer{background:var(--ink);color:#666;padding:32px;display:flex;justify-content:space-between;align-items:center;font-size:11px;letter-spacing:.04em}
+footer{background:var(--ink);color:#666;padding:32px;display:flex;justify-content:space-between;align-items:center;font-size:11px;letter-spacing:.04em;flex-wrap:wrap;gap:12px}
 footer .flogo{font-family:'Zen Antique',serif;font-size:16px;color:var(--bg)}
 footer .flogo span{color:#e07060}
+.fsocial a{color:#999;text-decoration:none;margin-left:16px}
+.fsocial a:hover{color:var(--bg)}
 @keyframes up{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
 .hero .eyebrow{animation:up .5s ease both .1s}
 .hero h1{animation:up .5s ease both .2s}
@@ -92,139 +94,144 @@ footer .flogo span{color:#e07060}
 .hero .form-box{animation:up .5s ease both .4s}
 .hero .form-note{animation:up .5s ease both .5s}
 @media(max-width:680px){
-  .paper-body{grid-template-columns:1fr}
-  .pmain p{columns:1}
-  .pmain{border-right:none;border-bottom:1px solid var(--rule)}
-  .vgrid{grid-template-columns:1fr}
-  .plans{grid-template-columns:1fr}
-  header{padding:14px 20px}
-  .hero,.sample,.pricing{padding-left:20px;padding-right:20px}
+.paper-body{grid-template-columns:1fr}
+.pmain p{columns:1}
+.pmain{border-right:none;border-bottom:1px solid var(--rule)}
+.vgrid{grid-template-columns:1fr}
+.plans{grid-template-columns:1fr}
+header{padding:14px 20px}
+.hero,.sample,.pricing{padding-left:20px;padding-right:20px}
 }
 </style>
 </head>
 <body>
 <header>
-  <div class="logo">AI<span>週報</span></div>
-  <nav>
-    <a href="#sample">サンプル</a>
-    <a href="#pricing">料金</a>
-    <a href="#subscribe">購読する</a>
-  </nav>
+<div class="logo">AI<span>週報</span></div>
+<nav>
+<a href="#sample">サンプル</a>
+<a href="#pricing">料金</a>
+<a href="#subscribe">購読する</a>
+<a href="https://note.com/ai_weekly_jp" target="_blank" rel="noopener">note</a>
+<a href="https://x.com/ai_weekly_jp" target="_blank" rel="noopener">X</a>
+</nav>
 </header>
 <section class="hero" id="subscribe">
-  <div class="eyebrow">Weekly AI Intelligence</div>
-  <h1>AIの波に、<br><em>乗り遅れるな。</em></h1>
-  <p class="lead">毎週火曜朝、厳選したAIニュース・使えるプロンプト・ツールレビューをお届け。読む時間10分、得られる情報は圧倒的。</p>
-  <form class="form-box" action="https://app.kit.com/forms/9541601/subscriptions" method="post" data-sv-form="9541601" target="_blank">
-    <input type="email" name="email_address" id="em" placeholder="メールアドレスを入力" required>
-    <button type="submit">無料で購読 →</button>
-  </form>
-  <p class="form-note">無料版：毎週ハイライト1本 ／ <b>PRO版：月額980円で全コンテンツ</b></p>
-  <div class="success" id="ok">✓ ありがとうございます！確認メールをお送りしました。</div>
+<div class="eyebrow">Weekly AI Intelligence</div>
+<h1>AIの波に、<br><em>乗り遅れるな。</em></h1>
+<p class="lead">毎週月曜朝、厳選したAIニュース・使えるプロンプト・ツールレビューをお届け。読む時間10分、得られる情報は圧倒的。</p>
+<form class="form-box" action="https://app.kit.com/forms/9541601/subscriptions" method="post" data-sv-form="9541601" target="_blank">
+<input type="email" name="email_address" id="em" placeholder="メールアドレスを入力" required>
+<button type="submit">無料で購読 →</button>
+</form>
+<p class="form-note">無料版：毎週ハイライト1本 ／ <b>PRO版：月額500円で全コンテンツ</b></p>
+<div class="success" id="ok">✓ ありがとうございます！確認メールをお送りしました。</div>
 </section>
 <div class="rule">— サンプル号 —</div>
 <section class="sample" id="sample">
-  <div class="sec-label">Vol.031 · 2026年6月2日号</div>
-  <div class="paper">
-    <div class="paper-head">
-      <span class="ptitle">AI週報 — Weekly Intelligence</span>
-      <span class="pmeta">Vol.031 · 2026.06.02 · 購読者 1,412名</span>
-    </div>
-    <div class="paper-body">
-      <div class="pmain">
-        <div class="byline">LEAD STORY · AI BUSINESS</div>
-        <h2>「AIエージェント元年」が静かに終わった週 ── 何が残り、何が消えたか</h2>
-        <p>今週、国内主要IT企業のQ1決算が出揃った。AI関連投資は前年比2.4倍に膨らんだ一方、AIエージェント系スタートアップの資金調達は前四半期比で37%減。「エージェント疲れ」とも呼ばれる現象が、数字として可視化された。最も生き残っているのは、特定業務に深く刺さった垂直型エージェントだ。汎用型はGAFAに吸収されるか、消えるかの二択になりつつある。中小企業にとっての示唆は明確で…… <span style="color:var(--ink3);font-style:italic">（続きはPRO版で）</span></p>
-      </div>
-      <div class="pside">
-        <div class="pblock">
-          <div class="plabel">今週の数字</div>
-          <div class="stat">$4.1T</div>
-          <div class="statlabel">AI市場2030年予測（McKinsey改訂版）</div>
-          <div class="statup">↑ 前回予測比 +18%</div>
-        </div>
-        <div class="pblock">
-          <div class="plabel">注目ツール</div>
-          <div class="ptitle2">Claude for Work — 実務導入レポ</div>
-          <p>法務・マーケ・人事の3部門で90日間試した結果。コスト削減額と、逆に増えた工数も正直に報告。</p>
-        </div>
-        <div class="pblock">
-          <div class="plabel">PRO限定</div>
-          <div class="ptitle2">今週の使えるプロンプト5選</div>
-          <p>競合分析・議事録要約・営業メール・コードレビュー依頼・採用JD生成</p>
-        </div>
-      </div>
-    </div>
-  </div>
+<div class="sec-label">サンプル号（イメージ）</div>
+<div class="paper">
+<div class="paper-head">
+<span class="ptitle">AI週報 — Weekly Intelligence</span>
+<span class="pmeta">配信中 · 毎週月曜</span>
+</div>
+<div class="paper-body">
+<div class="pmain">
+<div class="byline">LEAD STORY · AI BUSINESS</div>
+<h2>「AIエージェント元年」が静かに終わった週 ── 何が残り、何が消えたか</h2>
+<p>今週、国内主要IT企業のQ1決算が出揃った。AI関連投資は前年比2.4倍に膨らんだ一方、AIエージェント系スタートアップの資金調達は前四半期比で37%減。「エージェント疲れ」とも呼ばれる現象が、数字として可視化された。最も生き残っているのは、特定業務に深く刺さった垂直型エージェントだ。汎用型はGAFAに吸収されるか、消えるかの二択になりつつある。中小企業にとっての示唆は明確で…… <span style="color:var(--ink3);font-style:italic">（続きはPRO版で）</span></p>
+</div>
+<div class="pside">
+<div class="pblock">
+<div class="plabel">今週の数字</div>
+<div class="stat">$4.1T</div>
+<div class="statlabel">AI市場2030年予測（McKinsey改訂版）</div>
+<div class="statup">↑ 前回予測比 +18%</div>
+</div>
+<div class="pblock">
+<div class="plabel">注目ツール</div>
+<div class="ptitle2">Claude for Work — 実務導入レポ</div>
+<p>法務・マーケ・人事の3部門で90日間試した結果。コスト削減額と、逆に増えた工数も正直に報告。</p>
+</div>
+<div class="pblock">
+<div class="plabel">PRO限定</div>
+<div class="ptitle2">今週の使えるプロンプト5選</div>
+<p>競合分析・議事録要約・営業メール・コードレビュー依頼・採用JD生成</p>
+</div>
+</div>
+</div>
+</div>
 </section>
 <section class="values">
-  <div class="values-inner">
-    <h2>ノイズを消して、<br><span>本質だけ。</span></h2>
-    <div class="vgrid">
-      <div>
-        <div class="vnum">01 / 厳選</div>
-        <div class="vtitle">週100本から10本に絞る</div>
-        <p class="vbody">英日のAI記事を自動収集し、ビジネスインパクトが高いものだけを掲載。あなたが読むのは週10分だけでいい。</p>
-      </div>
-      <div>
-        <div class="vnum">02 / 実用</div>
-        <div class="vtitle">読んで終わりにしない</div>
-        <p class="vbody">毎号「使えるプロンプト」「ツール比較」「ユースケース」を収録。読んだその日から業務で試せる。</p>
-      </div>
-      <div>
-        <div class="vnum">03 / 継続</div>
-        <div class="vtitle">毎週火曜、必ず届く</div>
-        <p class="vbody">全自動配信のため、1号も欠かさない。忙しい週もAIのキャッチアップはAI週報に任せてください。</p>
-      </div>
-    </div>
-  </div>
+<div class="values-inner">
+<h2>ノイズを消して、<br><span>本質だけ。</span></h2>
+<div class="vgrid">
+<div>
+<div class="vnum">01 / 厳選</div>
+<div class="vtitle">週100本から10本に絞る</div>
+<p class="vbody">英日のAI記事を自動収集し、ビジネスインパクトが高いものだけを掲載。あなたが読むのは週10分だけでいい。</p>
+</div>
+<div>
+<div class="vnum">02 / 実用</div>
+<div class="vtitle">読んで終わりにしない</div>
+<p class="vbody">毎号「使えるプロンプト」「ツール比較」「ユースケース」を収録。読んだその日から業務で試せる。</p>
+</div>
+<div>
+<div class="vnum">03 / 継続</div>
+<div class="vtitle">毎週月曜、必ず届く</div>
+<p class="vbody">全自動配信のため、1号も欠かさない。忙しい週もAIのキャッチアップはAI週報に任せてください。</p>
+</div>
+</div>
+</div>
 </section>
 <section class="pricing" id="pricing">
-  <div class="sec-label">料金プラン</div>
-  <div class="plans">
-    <div class="plan">
-      <div class="pname">Free</div>
-      <div class="pprice">¥0</div>
-      <div class="pperiod">永久無料</div>
-      <ul class="pfeatures">
-        <li>毎週ハイライト記事1本</li>
-        <li>週次AIニュースまとめ</li>
-        <li>メール配信</li>
-      </ul>
-      <a href="#subscribe" class="pcta">無料で始める</a>
-    </div>
-    <div class="plan hot">
-      <div class="plan-badge">おすすめ</div>
-      <div class="pname">Pro</div>
-      <div class="pprice">¥500</div>
-      <div class="pperiod">/ 月（いつでも解約可）</div>
-      <ul class="pfeatures">
-        <li>全記事・全コンテンツ</li>
-        <li>週次プロンプトテンプレ5選</li>
-        <li>AIツール詳細レビュー</li>
-        <li>バックナンバー全アクセス</li>
-        <li>読者限定コミュニティ</li>
-      </ul>
-      <a href="https://buy.stripe.com/aFa3cv5Xc26M9mj6gQ53O01" class="pcta" target="_blank">PRO を始める →</a>
-    </div>
-  </div>
+<div class="sec-label">料金プラン</div>
+<div class="plans">
+<div class="plan">
+<div class="pname">Free</div>
+<div class="pprice">¥0</div>
+<div class="pperiod">永久無料</div>
+<ul class="pfeatures">
+<li>毎週ハイライト記事1本</li>
+<li>週次AIニュースまとめ</li>
+<li>メール配信</li>
+</ul>
+<a href="#subscribe" class="pcta">無料で始める</a>
+</div>
+<div class="plan hot">
+<div class="plan-badge">おすすめ</div>
+<div class="pname">Pro</div>
+<div class="pprice">¥500</div>
+<div class="pperiod">/ 月（いつでも解約可）</div>
+<ul class="pfeatures">
+<li>全記事・全コンテンツ</li>
+<li>週次プロンプトテンプレ5選</li>
+<li>AIツール詳細レビュー</li>
+<li>バックナンバー全アクセス</li>
+</ul>
+<a href="https://buy.stripe.com/aFa3cv5Xc26M9mj6gQ53O01" class="pcta" target="_blank">PRO を始める →</a>
+</div>
+</div>
 </section>
 <footer>
-  <div class="flogo">AI<span>週報</span></div>
-  <p>毎週火曜配信 · いつでも解約可 · メール末尾のリンクから配信停止</p>
+<div class="flogo">AI<span>週報</span></div>
+<p>毎週月曜配信 · いつでも解約可 · メール末尾のリンクから配信停止</p>
+<div class="fsocial">
+<a href="https://note.com/ai_weekly_jp" target="_blank" rel="noopener">note</a>
+<a href="https://x.com/ai_weekly_jp" target="_blank" rel="noopener">X</a>
+</div>
 </footer>
 <script>
 document.querySelector('.form-box').addEventListener('submit',function(e){
-  e.preventDefault();
-  const input=document.getElementById('em');
-  const v=input.value.trim();
-  if(!v||!v.includes('@')){input.style.outline='2px solid var(--red)';return}
-  input.style.outline='';
-  const data=new FormData();
-  data.append('email_address',v);
-  fetch('https://app.kit.com/forms/9541601/subscriptions',{method:'POST',body:data,headers:{'Accept':'application/json'}})
-    .then(r=>r.json()).then(()=>{document.getElementById('ok').style.display='block';input.value='';})
-    .catch(()=>{document.getElementById('ok').style.display='block';input.value='';});
+e.preventDefault();
+const input=document.getElementById('em');
+const v=input.value.trim();
+if(!v||!v.includes('@')){input.style.outline='2px solid var(--red)';return}
+input.style.outline='';
+const data=new FormData();
+data.append('email_address',v);
+fetch('https://app.kit.com/forms/9541601/subscriptions',{method:'POST',body:data,headers:{'Accept':'application/json'}})
+.then(r=>r.json()).then(()=>{document.getElementById('ok').style.display='block';input.value='';})
+.catch(()=>{document.getElementById('ok').style.display='block';input.value='';});
 });
 </script>
 </body>
