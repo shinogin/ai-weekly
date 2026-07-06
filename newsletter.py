@@ -16,7 +16,7 @@ from email.mime.text import MIMEText
 
 # ---------- 設定 ----------
 KIT_API_KEY = os.environ.get("KIT_API_KEY", "")
-STRIPE_PRO_URL = "https://buy.stripe.com/aFa3cv5Xc26M9mj6gQ53O01"
+STRIPE_PRO_URL = "https://buy.stripe.com/00wfZhdpE9zecyveNm53O02"
 LANDING_URL = "https://shinogin.github.io/ai-weekly"
 BLOG_URL = "https://ai-weekly-jp.blogspot.com/"  # 本文（日本語版）はBloggerに掲載
 
@@ -191,7 +191,7 @@ def render_email_teaser(vol, items):
 </div>
 <div style="margin:32px 0 24px;padding:20px;background:#111;color:#faf9f6;border-radius:4px">
   <div style="font-size:11px;letter-spacing:.12em;color:#e07060;margin-bottom:8px">PRO版のご案内</div>
-  <p style="font-size:13px;color:#bbb;margin:0 0 14px">PRO版（月額料金）では、今週収集した全記事の詳細版（全ソース・全タグ・今週の統計まとめ）をお届けします。</p>
+  <p style="font-size:13px;color:#bbb;margin:0 0 14px">PRO版（月額300円）では、今週収集した全記事の詳細版（全ソース・全タグ・今週の統計まとめ）をお届けします。</p>
   <a href="{STRIPE_PRO_URL}" style="display:inline-block;background:#c0392b;color:#fff;padding:11px 22px;text-decoration:none;font-size:13px;font-weight:500;border-radius:2px">PRO版にアップグレード →</a>
 </div>
 <div style="border-top:1px solid #ddd;padding-top:16px;margin-top:32px;color:#888;font-size:11px;text-align:center">
