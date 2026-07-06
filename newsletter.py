@@ -1,9 +1,12 @@
 """
-AI週報 - 自動配信スクリプト v4 (Kit + Blogger メール投稿版)
+AI週報 - 自動配信スクリプト v5 (Kit + Blogger メール投稿版 / PRO配信対応)
 - 無料RSS/API + GitHub Trending から AI関連ニュースを収集（追加コストゼロ）
 - HTMLレンダリングして Kit V4 API で配信
 - Bloggerには「メール投稿」機能経由で同時投稿（SMTPだけで完了、OAuth不要）
 - v4: 冒頭サマリー / 文脈説明文 / キーワードタグ / 今週のまとめ セクション追加
+- v5: PRO会員向けに「全記事詳細版」を別配信するロジックを追加
+       (KIT_PRO_TAG_ID が設定されている場合のみ有効。無料版とPRO版で内容を分けるが、
+        自動生成できない「プロンプト5選」「ツールレビュー」等の創作コンテンツは含めない)
 """
 import os, datetime, html, re, json, smtplib, ssl
 import urllib.request, urllib.parse, urllib.error
@@ -16,6 +19,10 @@ KIT_API_KEY = os.environ.get("KIT_API_KEY", "")
 STRIPE_PRO_URL = "https://buy.stripe.com/aFa3cv5Xc26M9mj6gQ53O01"
 LANDING_URL = "https://shinogin.github.io/ai-weekly"
 BLOG_URL = "https://ai-weekly-jp.blogspot.com/"  # 本文（日本語版）はBloggerに掲載
+
+# PRO会員配信用（Kitで「pro」タグを作成し、そのタグIDを設定すると有効化される）
+# 未設定の場合はPRO版配信をスキップする（無料版のみ配信）
+KIT_PRO_TAG_ID = os.environ.get("KIT_PRO_TAG_ID", "")
 
 # Blogger メール投稿（SMTPで送るだけで自動投稿される）
 BLOGGER_POST_EMAIL = os.environ.get("BLOGGER_POST_EMAIL", "")
@@ -150,8 +157,54 @@ def build_weekly_summary(items):
     lines = [f"<li style='margin:0 0 8px'><strong>#{k}</strong> が今週最も活発（{v}件）</li>" for k, v in top]
     return "".join(lines)
 
-# ---------- レンダリング ----------
+# ---------- レンダリング: 無料版（teaser） ----------
+SRC_JA = {
+    "arXiv cs.AI": "AI研究の最新論文",
+    "arXiv cs.LG": "機械学習の最新論文",
+    "Hugging Face Papers": "いま話題の論文（Hugging Face）",
+    "Hacker News": "海外で話題のAIニュース",
+}
+
+def render_email_teaser(vol, items):
+    today = datetime.date.today().strftime("%Y年%m月%d日")
+    topics = []
+    for it in items:
+        src = it["source"]
+        label = SRC_JA.get(src, "GitHubで人気のAIツール" if src.startswith("GitHub") else src)
+        if label not in topics:
+            topics.append(label)
+    topic_html = "".join(f'<li style="margin:0 0 8px">{html.escape(t)}</li>' for t in topics[:6])
+    return f"""<!DOCTYPE html>
+<html><body style="font-family:'Helvetica Neue',Arial,sans-serif;max-width:560px;margin:0 auto;padding:24px;color:#111;background:#faf9f6;line-height:1.7">
+<div style="border-bottom:2px solid #111;padding-bottom:16px;margin-bottom:24px">
+  <div style="font-size:11px;letter-spacing:.15em;color:#c0392b;text-transform:uppercase;margin-bottom:8px">Weekly AI Intelligence</div>
+  <h1 style="font-family:Georgia,serif;font-size:26px;margin:0;letter-spacing:-.01em">AI週報 Vol.{vol}</h1>
+  <div style="color:#888;font-size:12px;margin-top:6px">{today} 配信</div>
+</div>
+<p style="font-size:15px;color:#333;margin:0 0 18px">今週もAI週報をお届けします。海外の最新AIニュースや論文を、専門用語をかみくだいて<strong>中高生でもわかる日本語</strong>で解説しました。</p>
+<div style="background:#fff8f0;border-left:3px solid #c0392b;padding:14px 18px;margin-bottom:24px">
+  <div style="font-size:13px;color:#666;margin-bottom:8px">今週の内容</div>
+  <ul style="padding:0 0 0 18px;margin:0;color:#333;font-size:14px">{topic_html}</ul>
+</div>
+<div style="text-align:center;margin:28px 0">
+  <a href="{BLOG_URL}" style="display:inline-block;background:#111;color:#fff;padding:14px 32px;text-decoration:none;font-size:15px;font-weight:500;border-radius:3px">今週号をやさしい日本語で読む →</a>
+</div>
+<div style="margin:32px 0 24px;padding:20px;background:#111;color:#faf9f6;border-radius:4px">
+  <div style="font-size:11px;letter-spacing:.12em;color:#e07060;margin-bottom:8px">PRO版のご案内</div>
+  <p style="font-size:13px;color:#bbb;margin:0 0 14px">PRO版（月額料金）では、今週収集した全記事の詳細版（全ソース・全タグ・今週の統計まとめ）をお届けします。</p>
+  <a href="{STRIPE_PRO_URL}" style="display:inline-block;background:#c0392b;color:#fff;padding:11px 22px;text-decoration:none;font-size:13px;font-weight:500;border-radius:2px">PRO版にアップグレード →</a>
+</div>
+<div style="border-top:1px solid #ddd;padding-top:16px;margin-top:32px;color:#888;font-size:11px;text-align:center">
+  <p style="margin:0 0 6px">AI週報 · 毎週月曜配信 · <a href="{LANDING_URL}" style="color:#888">公式サイト</a></p>
+  <p style="margin:0">配信停止はメール末尾のリンクから</p>
+</div></body></html>"""
+
+def render_preview(items):
+    return "海外の最新AIニュースを、やさしい日本語で。"
+
+# ---------- レンダリング: PRO版（全記事詳細版） ----------
 def render_html(vol, items):
+    """PRO会員向け：全記事・全ソース・タグ・今週の統計を含む詳細版"""
     today      = datetime.date.today().strftime("%Y年%m月%d日")
     summary    = build_summary(items)
     weekly_sum = build_weekly_summary(items)
@@ -187,9 +240,9 @@ def render_html(vol, items):
     return f"""<!DOCTYPE html>
 <html><body style="font-family:'Helvetica Neue',Arial,sans-serif;max-width:640px;margin:0 auto;padding:24px;color:#111;background:#faf9f6;line-height:1.7">
 <div style="border-bottom:2px solid #111;padding-bottom:16px;margin-bottom:24px">
-  <div style="font-size:11px;letter-spacing:.15em;color:#c0392b;text-transform:uppercase;margin-bottom:8px">Weekly AI Intelligence</div>
-  <h1 style="font-family:Georgia,serif;font-size:28px;margin:0;letter-spacing:-.01em">AI週報 Vol.{vol}</h1>
-  <div style="color:#888;font-size:12px;margin-top:6px">{today} 配信 · 厳選AIニュース</div>
+  <div style="font-size:11px;letter-spacing:.15em;color:#c0392b;text-transform:uppercase;margin-bottom:8px">Weekly AI Intelligence · PRO</div>
+  <h1 style="font-family:Georgia,serif;font-size:28px;margin:0;letter-spacing:-.01em">AI週報 Vol.{vol}（PRO版・全記事詳細）</h1>
+  <div style="color:#888;font-size:12px;margin-top:6px">{today} 配信 · PRO会員限定</div>
 </div>
 <div style="background:#fff8f0;border-left:3px solid #c0392b;padding:14px 18px;margin-bottom:28px;font-size:14px;color:#444;line-height:1.7">
   {summary}
@@ -201,73 +254,26 @@ def render_html(vol, items):
     {weekly_sum}
   </ul>
 </div>
-<div style="margin:32px 0 24px;padding:24px;background:#111;color:#faf9f6;border-radius:4px">
-  <div style="font-size:11px;letter-spacing:.12em;color:#e07060;margin-bottom:8px">PRO版のご案内</div>
-  <h2 style="font-family:Georgia,serif;font-size:20px;margin:0 0 10px">もっと深く、もっと使えるAI情報を</h2>
-  <p style="font-size:13px;color:#bbb;margin:0 0 16px">PRO版（月額¥500）では、全記事の詳細解説 / 週次プロンプトテンプレ5選 / AIツール詳細レビュー / バックナンバー全アクセスが追加で読めます。</p>
-  <a href="{STRIPE_PRO_URL}" style="display:inline-block;background:#c0392b;color:#fff;padding:12px 24px;text-decoration:none;font-size:13px;font-weight:500;border-radius:2px">PRO版にアップグレード →</a>
-</div>
 <div style="border-top:1px solid #ddd;padding-top:16px;margin-top:32px;color:#888;font-size:11px;text-align:center">
-  <p style="margin:0 0 6px">AI週報 · 毎週月曜配信 · <a href="{LANDING_URL}" style="color:#888">公式サイト</a></p>
+  <p style="margin:0 0 6px">AI週報 PRO · 毎週月曜配信 · <a href="{LANDING_URL}" style="color:#888">公式サイト</a></p>
   <p style="margin:0">配信停止はメール末尾のリンクから</p>
 </div></body></html>"""
-
-# 自動配信メールは「英語の壁」をやめ、短い日本語の予告＋本文(日本語版)への導線にする。
-# 本文の英語アブストラクトはAdSense審査・読者維持の両面で不利なため、メールには載せない。
-SRC_JA = {
-    "arXiv cs.AI": "AI研究の最新論文",
-    "arXiv cs.LG": "機械学習の最新論文",
-    "Hugging Face Papers": "いま話題の論文（Hugging Face）",
-    "Hacker News": "海外で話題のAIニュース",
-}
-
-def render_email_teaser(vol, items):
-    today = datetime.date.today().strftime("%Y年%m月%d日")
-    topics = []
-    for it in items:
-        src = it["source"]
-        label = SRC_JA.get(src, "GitHubで人気のAIツール" if src.startswith("GitHub") else src)
-        if label not in topics:
-            topics.append(label)
-    topic_html = "".join(f'<li style="margin:0 0 8px">{html.escape(t)}</li>' for t in topics[:6])
-    return f"""<!DOCTYPE html>
-<html><body style="font-family:'Helvetica Neue',Arial,sans-serif;max-width:560px;margin:0 auto;padding:24px;color:#111;background:#faf9f6;line-height:1.7">
-<div style="border-bottom:2px solid #111;padding-bottom:16px;margin-bottom:24px">
-  <div style="font-size:11px;letter-spacing:.15em;color:#c0392b;text-transform:uppercase;margin-bottom:8px">Weekly AI Intelligence</div>
-  <h1 style="font-family:Georgia,serif;font-size:26px;margin:0;letter-spacing:-.01em">AI週報 Vol.{vol}</h1>
-  <div style="color:#888;font-size:12px;margin-top:6px">{today} 配信</div>
-</div>
-<p style="font-size:15px;color:#333;margin:0 0 18px">今週もAI週報をお届けします。海外の最新AIニュースや論文を、専門用語をかみくだいて<strong>中高生でもわかる日本語</strong>で解説しました。</p>
-<div style="background:#fff8f0;border-left:3px solid #c0392b;padding:14px 18px;margin-bottom:24px">
-  <div style="font-size:13px;color:#666;margin-bottom:8px">今週の内容</div>
-  <ul style="padding:0 0 0 18px;margin:0;color:#333;font-size:14px">{topic_html}</ul>
-</div>
-<div style="text-align:center;margin:28px 0">
-  <a href="{BLOG_URL}" style="display:inline-block;background:#111;color:#fff;padding:14px 32px;text-decoration:none;font-size:15px;font-weight:500;border-radius:3px">今週号をやさしい日本語で読む →</a>
-</div>
-<div style="margin:32px 0 24px;padding:20px;background:#111;color:#faf9f6;border-radius:4px">
-  <div style="font-size:11px;letter-spacing:.12em;color:#e07060;margin-bottom:8px">PRO版のご案内</div>
-  <p style="font-size:13px;color:#bbb;margin:0 0 14px">PRO版（月額¥500）では、全記事の詳細解説 / 週次プロンプトテンプレ5選 / AIツール詳細レビュー / バックナンバー全アクセスが読めます。</p>
-  <a href="{STRIPE_PRO_URL}" style="display:inline-block;background:#c0392b;color:#fff;padding:11px 22px;text-decoration:none;font-size:13px;font-weight:500;border-radius:2px">PRO版にアップグレード →</a>
-</div>
-<div style="border-top:1px solid #ddd;padding-top:16px;margin-top:32px;color:#888;font-size:11px;text-align:center">
-  <p style="margin:0 0 6px">AI週報 · 毎週月曜配信 · <a href="{LANDING_URL}" style="color:#888">公式サイト</a></p>
-  <p style="margin:0">配信停止はメール末尾のリンクから</p>
-</div></body></html>"""
-
-def render_preview(items):
-    return "海外の最新AIニュースを、やさしい日本語で。"
 
 # ---------- 配信: Kit ----------
-def send_kit(subject, html_body, preview):
+def send_kit(subject, html_body, preview, subscriber_filter=None):
+    """Kit Broadcast APIでメール配信する。
+    subscriber_filter を渡さない場合は全購読者に配信される。
+    PRO限定配信の場合は [{"all": [{"type": "tag", "ids": [KIT_PRO_TAG_ID]}]}] のような形式で渡す。"""
     if not KIT_API_KEY:
         print("[SKIP] KIT_API_KEY not set"); return False
     now     = datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
-    payload = json.dumps({
+    payload_dict = {
         "subject": subject, "content": html_body, "description": subject,
         "public": False, "published_at": now, "preview_text": preview,
-        "send_at": now, "subscriber_filter": [{"all": []}]
-    }).encode()
+        "send_at": now,
+        "subscriber_filter": subscriber_filter if subscriber_filter else [{"all": []}]
+    }
+    payload = json.dumps(payload_dict).encode()
     req = urllib.request.Request(
         "https://api.kit.com/v4/broadcasts", data=payload, method="POST",
         headers={"X-Kit-Api-Key": KIT_API_KEY, "Content-Type": "application/json"})
@@ -276,6 +282,18 @@ def send_kit(subject, html_body, preview):
             print("[KIT]", r.status, r.read().decode()[:200]); return True
     except urllib.error.HTTPError as e:
         print("[KIT ERROR]", e.code, e.read().decode()[:200]); return False
+
+def send_kit_pro(vol, items):
+    """PRO会員（KIT_PRO_TAG_IDタグ保有者）向けに詳細版を配信する。
+    KIT_PRO_TAG_ID が未設定の場合は何もしない（無料版のみの現行運用を維持）。"""
+    if not KIT_PRO_TAG_ID:
+        print("[SKIP] KIT_PRO_TAG_ID not set — PRO配信は未設定のためスキップ")
+        return False
+    subject = f"AI週報 Vol.{vol}｜PRO版・全記事詳細"
+    body    = render_html(vol, items)
+    preview = "PRO会員向け：今週収集した全記事の詳細版です。"
+    filt    = [{"all": [{"type": "tag", "ids": [int(KIT_PRO_TAG_ID)]}]}]
+    return send_kit(subject, body, preview, subscriber_filter=filt)
 
 # ---------- 配信: Blogger (メール投稿) ----------
 def post_blogger_via_email(subject, html_body):
@@ -354,6 +372,8 @@ def main():
     if ok:
         write_last_vol(vol)   # 送信成功時のみ号数を確定・永続化
         print(f"[VOL] saved Vol.{vol} to {VOL_FILE}")
+        # PRO会員向け詳細版を配信（KIT_PRO_TAG_ID未設定の場合はスキップされる）
+        send_kit_pro(vol, items)
     # X投稿用テキスト（コピペ用）をログに出力
     tweet = compose_tweet(vol, items)
     print("[X TWEET - コピペ用] " + "-"*40)
