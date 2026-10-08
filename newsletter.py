@@ -1,12 +1,10 @@
 """
-AI週報 - 自動配信スクリプト v5 (Kit + Blogger メール投稿版 / PRO配信対応)
+AI週報 - 自動配信スクリプト v6 (Kit配信 / note導線)
 - 無料RSS/API + GitHub Trending から AI関連ニュースを収集（追加コストゼロ）
 - HTMLレンダリングして Kit V4 API で配信
 - Bloggerには「メール投稿」機能経由で同時投稿（SMTPだけで完了、OAuth不要）
 - v4: 冒頭サマリー / 文脈説明文 / キーワードタグ / 今週のまとめ セクション追加
-- v5: PRO会員向けに「全記事詳細版」を別配信するロジックを追加
-       (KIT_PRO_TAG_ID が設定されている場合のみ有効。無料版とPRO版で内容を分けるが、
-        自動生成できない「プロンプト5選」「ツールレビュー」等の創作コンテンツは含めない)
+- v6: Kit PRO配信を廃止。本文はnoteで公開（最新号は無料、公開2週間後に1本100円）
 """
 import os, datetime, html, re, json, smtplib, ssl
 import urllib.request, urllib.parse, urllib.error
@@ -18,7 +16,7 @@ from email.mime.text import MIMEText
 KIT_API_KEY = os.environ.get("KIT_API_KEY", "")
 STRIPE_PRO_URL = "https://buy.stripe.com/00wfZhdpE9zecyveNm53O02"
 LANDING_URL = "https://shinogin.github.io/ai-weekly"
-BLOG_URL = "https://ai-weekly-jp.blogspot.com/"  # 本文（日本語版）はBloggerに掲載
+NOTE_URL = "https://note.com/ai_weekly_jp"  # 本文（日本語版）はnoteに掲載
 
 # PRO会員配信用（Kitで「pro」タグを作成し、そのタグIDを設定すると有効化される）
 # 未設定の場合はPRO版配信をスキップする（無料版のみ配信）
@@ -187,12 +185,7 @@ def render_email_teaser(vol, items):
   <ul style="padding:0 0 0 18px;margin:0;color:#333;font-size:14px">{topic_html}</ul>
 </div>
 <div style="text-align:center;margin:28px 0">
-  <a href="{BLOG_URL}" style="display:inline-block;background:#111;color:#fff;padding:14px 32px;text-decoration:none;font-size:15px;font-weight:500;border-radius:3px">今週号をやさしい日本語で読む →</a>
-</div>
-<div style="margin:32px 0 24px;padding:20px;background:#111;color:#faf9f6;border-radius:4px">
-  <div style="font-size:11px;letter-spacing:.12em;color:#e07060;margin-bottom:8px">PRO版のご案内</div>
-  <p style="font-size:13px;color:#bbb;margin:0 0 14px">PRO版（月額300円）では、今週収集した全記事の詳細版（全ソース・全タグ・今週の統計まとめ）をお届けします。</p>
-  <a href="{STRIPE_PRO_URL}" style="display:inline-block;background:#c0392b;color:#fff;padding:11px 22px;text-decoration:none;font-size:13px;font-weight:500;border-radius:2px">PRO版にアップグレード →</a>
+  <a href="{NOTE_URL}" style="display:inline-block;background:#111;color:#fff;padding:14px 32px;text-decoration:none;font-size:15px;font-weight:500;border-radius:3px">今週号をやさしい日本語で読む →</a>
 </div>
 <div style="border-top:1px solid #ddd;padding-top:16px;margin-top:32px;color:#888;font-size:11px;text-align:center">
   <p style="margin:0 0 6px">AI週報 · 毎週月曜配信 · <a href="{LANDING_URL}" style="color:#888">公式サイト</a></p>
@@ -367,13 +360,12 @@ def main():
     preview   = render_preview(items)
     ok = send_kit(subject, email_body, preview)
     # Bloggerへの英語アブストラクト自動投稿は停止（AdSense審査・読者維持に不利なため）。
-    # 本文の日本語版は毎週の手動フローでnote/Bloggerに掲載する。
+    # 本文の日本語版は毎週の手動フローでnoteに掲載する。
     # post_blogger_via_email(subject, render_html(vol, items))
     if ok:
         write_last_vol(vol)   # 送信成功時のみ号数を確定・永続化
         print(f"[VOL] saved Vol.{vol} to {VOL_FILE}")
-        # PRO会員向け詳細版を配信（KIT_PRO_TAG_ID未設定の場合はスキップされる）
-        send_kit_pro(vol, items)
+        # Kit PRO配信は廃止（収益化はnoteの有料バックナンバーへ移行）
     # X投稿用テキスト（コピペ用）をログに出力
     tweet = compose_tweet(vol, items)
     print("[X TWEET - コピペ用] " + "-"*40)
